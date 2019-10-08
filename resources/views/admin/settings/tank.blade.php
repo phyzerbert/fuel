@@ -39,18 +39,35 @@
                                     <th>Fuel Type</th>
                                     <th>Capacity</th>
                                     <th>Low Level</th>
+                                    <th>Filling</th>
+                                    <th>Unloading</th>
+                                    <th>Balance</th>
                                     <th>Description</th>
                                     <th style="width:150px;">Action</th>
                                 </tr>
                             </thead>
-                            <tbody>                                
+                            <tbody>
+                                @php
+                                    $footer_filling = $footer_unloading = $footer_balance = 0;
+                                @endphp                               
                                 @foreach ($data as $item)
+                                    @php
+                                        $unloading = $item->unloadings()->sum('amount');
+                                        $filling = $item->fillings()->sum('amount');
+                                        $balance = $filling - $unloading;
+                                        $footer_filling += $filling;
+                                        $footer_unloading += $unloading;
+                                        $footer_balance += $balance;
+                                    @endphp
                                     <tr>
                                         <td>{{ $loop->index + 1 }}</td>
                                         <td class="name">{{$item->name}}</td>
                                         <td class="fuel" data-id="{{$item->fuel_id}}">{{$item->fuel->name}}</td>
                                         <td class="capacity" data-value="{{$item->capacity}}">{{number_format($item->capacity)}}</td>
                                         <td class="low_level" data-value="{{$item->low_level}}">{{number_format($item->low_level)}}</td>
+                                        <td class="filling">{{number_format($filling)}}</td>
+                                        <td class="unloading">{{number_format($unloading)}}</td>
+                                        <td class="balance">{{number_format($balance)}}</td>
                                         <td class="description">{{$item->description}}</td>
                                         <td class="py-1">
                                             <a href="#" class="btn btn-sm btn-primary btn-icon mr-1 btn-edit" data-id="{{$item->id}}" data-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i></a>
@@ -59,6 +76,15 @@
                                     </tr>
                                 @endforeach
                             </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="5"></th>
+                                    <th>{{number_format($footer_filling)}}</th>
+                                    <th>{{number_format($footer_unloading)}}</th>
+                                    <th>{{number_format($footer_balance)}}</th>
+                                    <th colspan="3"></th>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>

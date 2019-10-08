@@ -15,5 +15,5 @@ class Fuel extends Model
     public function tanks(){
         return $this->hasMany(Tank::class);
     }
-    
+        
 }

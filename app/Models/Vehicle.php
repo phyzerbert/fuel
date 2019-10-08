@@ -11,4 +11,8 @@ class Vehicle extends Model
     public function fuel(){
         return $this->belongsTo(Fuel::class);
     }
+
+    public function unloadings(){
+        return $this->hasMany(Unloading::class);
+    }
 }

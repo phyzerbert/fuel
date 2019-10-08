@@ -36,14 +36,26 @@
                                 <tr class="bg-blue">
                                     <th style="width:40px;">#</th>
                                     <th>Name</th>
+                                    <th>Filling</th>
+                                    <th>Unloading</th>
+                                    <th>Balance</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>                                
                                 @foreach ($data as $item)
+                                    @php
+                                        $tank_array = $item->tanks->pluck('id');
+                                        $unloading = \App\Models\Unloading::whereIn('tank_id', $tank_array)->sum('amount');
+                                        $filling = \App\Models\Filling::whereIn('tank_id', $tank_array)->sum('amount');
+                                        $balance = $filling - $unloading;
+                                    @endphp
                                     <tr>
                                         <td>{{ $loop->index + 1 }}</td>
                                         <td class="name">{{$item->name}}</td>
+                                        <td>{{number_format($filling)}}</td>
+                                        <td>{{number_format($unloading)}}</td>
+                                        <td>{{number_format($balance)}}</td>
                                         <td class="py-1">
                                             <a href="#" class="btn btn-sm btn-primary btn-icon mr-1 btn-edit" data-id="{{$item->id}}" data-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i></a>
                                             <a href="{{route('fuel.delete', $item->id)}}" class="btn btn-sm btn-danger btn-icon" data-id="{{$item->id}}" onclick="return window.confirm('Are you sure?')" data-toggle="tooltip" title="Delete"><i class="fas fa-trash-alt"></i></a>

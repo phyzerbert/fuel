@@ -15,10 +15,12 @@
         <link href="{{asset('master/plugins/fontawesome/css/all.min.css')}}" rel="stylesheet">
         <link href="{{asset('master/plugins/typicons/src/typicons.min.css')}}" rel="stylesheet">
         <link href="{{asset('master/plugins/themify-icons/themify-icons.min.css')}}" rel="stylesheet">
-        <!--Third party Styles(used by this page)--> 
-        <link href="{{asset('master/plugins/datatables/dataTables.bootstrap4.min.css')}}" rel="stylesheet">
+        <link href="{{asset('master/plugins/toastr/toastr.css')}}" rel="stylesheet">
+        <link href="{{asset('master/plugins/daterangepicker/daterangepicker.min.css')}}" rel="stylesheet">
         <!--Start Your Custom Style Now-->
         <link href="{{asset('master/dist/css/style.css')}}" rel="stylesheet">
+        <link href="{{asset('master/dist/css/custom.css')}}" rel="stylesheet">
+        @yield('style')
     </head>
     <body class="fixed">
         <!-- Page Loader -->
@@ -52,6 +54,9 @@
         <script src="{{asset('master/plugins/bootstrap/js/bootstrap.min.js')}}"></script>
         <script src="{{asset('master/plugins/metisMenu/metisMenu.min.js')}}"></script>
         <script src="{{asset('master/plugins/perfect-scrollbar/dist/perfect-scrollbar.min.js')}}"></script>
+        <script src="{{asset('master/plugins/toastr/toastr.min.js')}}"></script>
+        <script src="{{asset('master/plugins/moment/moment.js')}}"></script>
+        <script src="{{asset('master/plugins/daterangepicker/jquery.daterangepicker.min.js')}}"></script>
 
         <!--Page Scripts(used by all page)-->
         <script src="{{asset('master/dist/js/sidebar.js')}}"></script>
@@ -60,6 +65,43 @@
 
         <script>
             $('[data-toggle="tooltip"]').tooltip();
+        </script>
+
+        <script>
+            var notification = '{!! session()->get("success"); !!}';
+            if(notification != ''){
+                toastr_call("success","Success",notification);
+            }
+            var errors_string = '{!! json_encode($errors->all()); !!}';
+            errors_string=errors_string.replace("[","").replace("]","").replace(/\"/g,"");
+            var errors = errors_string.split(",");
+            if (errors_string != "") {
+                for (let i = 0; i < errors.length; i++) {
+                    const element = errors[i];
+                    toastr_call("error","Error",element);             
+                } 
+            }       
+
+            function toastr_call(type,title,msg,override){
+                toastr[type](msg, title,override);
+                toastr.options = {
+                    "closeButton": false,
+                    "debug": false,
+                    "newestOnTop": false,
+                    "progressBar": true,
+                    "positionClass": "toast-top-center",
+                    "preventDuplicates": false,
+                    "onclick": null,
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "extendedTimeOut": "1000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                }  
+            }
         </script>
 
 

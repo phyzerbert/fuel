@@ -11,4 +11,12 @@ class Tank extends Model
     public function fuel(){
         return $this->belongsTo(Fuel::class);
     }
+
+    public function unloadings(){
+        return $this->hasMany(Unloading::class);
+    }
+    
+    public function fillings(){
+        return $this->hasMany(Filling::class);
+    }
 }

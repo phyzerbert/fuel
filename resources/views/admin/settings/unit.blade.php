@@ -36,6 +36,7 @@
                                 <tr class="bg-blue">
                                     <th style="width:40px;">#</th>
                                     <th>Name</th>
+                                    <th>Number Of Users</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -44,6 +45,7 @@
                                     <tr>
                                         <td>{{ $loop->index + 1 }}</td>
                                         <td class="name">{{$item->name}}</td>
+                                        <td class="number_of_users">{{$item->users->count()}}</td>
                                         <td class="py-1">
                                             <a href="#" class="btn btn-sm btn-primary btn-icon mr-1 btn-edit" data-id="{{$item->id}}" data-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i></a>
                                             <a href="{{route('unit.delete', $item->id)}}" class="btn btn-sm btn-danger btn-icon" data-id="{{$item->id}}" onclick="return window.confirm('Are you sure?')" data-toggle="tooltip" title="Delete"><i class="fas fa-trash-alt"></i></a>

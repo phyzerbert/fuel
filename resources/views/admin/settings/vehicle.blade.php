@@ -39,18 +39,23 @@
                                     <th>Fuel Type</th>
                                     <th>Type</th>
                                     <th>Driver</th>
+                                    <th>Unloading Amount</th>
                                     <th>Description</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>                                
                                 @foreach ($data as $item)
+                                    @php
+                                        $unloading = $item->unloadings()->sum('amount');
+                                    @endphp
                                     <tr>
                                         <td>{{ $loop->index + 1 }}</td>
                                         <td class="number">{{$item->number}}</td>
                                         <td class="fuel" data-id="{{$item->fuel_id}}">@if($item->fuel){{$item->fuel->name}}@endif</td>
                                         <td class="type">{{$item->type}}</td>
                                         <td class="driver">{{$item->driver}}</td>
+                                        <td class="description">{{number_format($unloading)}}</td>
                                         <td class="description">{{$item->description}}</td>
                                         <td class="py-1">
                                             <a href="#" class="btn btn-sm btn-primary btn-icon mr-1 btn-edit" data-id="{{$item->id}}" data-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i></a>

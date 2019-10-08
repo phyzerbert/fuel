@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Unloading;
+use App\Models\Vehicle;
 
 class HomeController extends Controller
 {
@@ -21,10 +23,30 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function index()
+    public function index(Request $request)
     {
         config(['site.page' => 'home']);
-        return view('home');
+
+        $limit = 10;
+        $period_range = array();
+        $period = '';
+        $vehicles = Vehicle::all();
+
+        if($request->get('period') != ''){
+            $period = $request->get('period');
+            $from = substr($period, 0, 10);
+            $to = substr($period, 14, 10);
+            $period_range = [$from, $to];
+        }
+
+        $vehicles_data = $vehicles->sortByDesc(function ($vehicles) use($period_range) {
+                        $mod = $vehicles->unloadings();
+                        if(count($period_range)){
+                            $mod = $mod->whereBetween('unloading_date', $period_range);
+                        }
+                        return $mod->sum('amount');
+                    })->take($limit);
+        return view('home', compact('vehicles_data', 'period'));
     }
 
     public function set_pagesize(Request $request){

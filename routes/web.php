@@ -17,7 +17,19 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::any('/home', 'HomeController@index')->name('home');
+
+
+Route::any('/unloading/index', 'UnloadingController@index')->name('unloading.index');
+Route::post('/unloading/create', 'UnloadingController@create')->name('unloading.create');
+Route::post('/unloading/edit', 'UnloadingController@edit')->name('unloading.edit');
+Route::get('/unloading/delete/{id}', 'UnloadingController@delete')->name('unloading.delete');
+
+
+Route::any('/filling/index', 'FillingController@index')->name('filling.index');
+Route::post('/filling/create', 'FillingController@create')->name('filling.create');
+Route::post('/filling/edit', 'FillingController@edit')->name('filling.edit');
+Route::get('/filling/delete/{id}', 'FillingController@delete')->name('filling.delete');
 
 Route::get('/profile', 'UserController@profile')->name('profile');
 Route::post('/updateuser', 'UserController@updateuser')->name('updateuser');
