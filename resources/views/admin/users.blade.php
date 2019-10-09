@@ -384,7 +384,11 @@
             $("#btn-reset").click(function(){
                 $("#search_name").val('');
                 $("#search_unit").val('');
-            });    
+            });   
+            
+            $("#pagesize").change(function(){
+                $("#pagesize_form").submit();
+            });   
         });
     </script>
 @endsection

@@ -6,27 +6,20 @@ use Illuminate\Http\Request;
 use App\Models\Unloading;
 use App\Models\Vehicle;
 
+use Auth;
+
 class HomeController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->middleware('auth');
     }
 
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
     public function index(Request $request)
     {
         config(['site.page' => 'home']);
 
+        $user = Auth::user();
         $limit = 10;
         $period_range = array();
         $period = '';
@@ -39,8 +32,11 @@ class HomeController extends Controller
             $period_range = [$from, $to];
         }
 
-        $vehicles_data = $vehicles->sortByDesc(function ($vehicles) use($period_range) {
+        $vehicles_data = $vehicles->sortByDesc(function ($vehicles) use($period_range, $user) {
                         $mod = $vehicles->unloadings();
+                        if($user->unit){
+                            $mod = $mod->where('unit_id', $user_unit_id);
+                        }
                         if(count($period_range)){
                             $mod = $mod->whereBetween('unloading_date', $period_range);
                         }
