@@ -26,9 +26,7 @@
             <div class="col-md-12">
                 <div class="card card-body card-fill">
                     <div class="">
-                        @if ($role == 'admin')
-                            <button type="button" class="btn btn-success btn-sm float-right mg-b-5" id="btn-add"><i class="fas fa-plus mr-1"></i>Add New</button>
-                        @endif
+                        <button type="button" class="btn btn-success btn-sm float-right mg-b-5" id="btn-add"><i class="fas fa-plus mr-1"></i>Add New</button>
                     </div>
                     <div class="table-responsive mt-2">
                         <table class="table table-bordered table-hover">
