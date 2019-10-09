@@ -48,7 +48,7 @@
                         </form>
                     </div>
                     <div class="card-body">
-                        <div id="vehicle_chart" style="width: 100%; height:500px;""></div>
+                        <div id="vehicle_chart" style="width: 100%; height:400px;""></div>
                     </div>
                 </div>
             </div>

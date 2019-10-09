@@ -49,5 +49,9 @@ class User extends Authenticatable
         return $this->belongsTo('App\Models\Unit');
     }
 
+    public function tank(){
+        return $this->belongsTo('App\Models\Tank');
+    }
+
 
 }

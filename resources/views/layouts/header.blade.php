@@ -12,7 +12,7 @@
                         <div class="dropdown-header d-sm-none">
                             <a href="#" class="header-arrow"><i class="icon ion-md-arrow-back"></i></a>
                         </div>
-                        <a href="#" class="dropdown-item"><i class="typcn typcn-user-outline"></i> My Profile</a>
+                        <a href="{{ route('profile') }}" class="dropdown-item"><i class="typcn typcn-user-outline"></i> My Profile</a>
                         <a href="{{ route('logout') }}" class="dropdown-item"
                             onclick="event.preventDefault();
                             document.getElementById('logout-form').submit();" 

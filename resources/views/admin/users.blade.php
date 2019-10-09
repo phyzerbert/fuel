@@ -49,8 +49,9 @@
                                 <tr class="bg-blue">
                                     <th style="width:40px">#</th>
                                     <th>Username</th>
-                                    <th>{{__('Unit')}}</th>
-                                    <th>{{__('Role')}}</th>
+                                    <th>Unit</th>
+                                    <th>Role</th>
+                                    <th>Tank</th>
                                     <th>Status</th>
                                     <th style="width:150px">{{__('Action')}}</th>
                                 </tr>
@@ -62,6 +63,7 @@
                                         <td class="username">{{$item->name}}</td>
                                         <td class="unit" data-id="{{$item->unit_id}}">@isset($item->unit->name){{$item->unit->name}}@endisset</td>
                                         <td class="role" data-id="{{$item->role_id}}">{{$item->role->name}}</td>
+                                        <td class="tank" data-id="{{$item->tank_id}}">@isset($item->tank->name){{$item->tank->name}}@endisset</td>
                                         <td class="status" data-id="{{$item->status}}">
                                             @if($item->status == 1)
                                                 <span class="badge badge-primary">Approved</span>
@@ -105,16 +107,17 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label class="control-label">Username</label>
-                            <input class="form-control" type="text" name="name" id="name" placeholder="Username">
+                            <input class="form-control" type="text" name="name" id="name" placeholder="Username" required />
                             <span id="name_error" class="invalid-feedback">
                                 <strong></strong>
                             </span>
                         </div>
                         <div class="form-group">
                             <label class="control-label">Role</label>
-                            <select name="role" id="role" class="form-control">
-                                <option value="1">Admin</option>
-                                <option value="2" selected>User</option>
+                            <select name="role" id="create_role" class="form-control" required>
+                                <option value="1">SuperAdmin</option>
+                                <option value="2">Admin</option>
+                                <option value="3" selected>User</option>
                             </select>
                             <span id="role_error" class="invalid-feedback">
                                 <strong></strong>
@@ -132,9 +135,21 @@
                                 <strong></strong>
                             </span>
                         </div>
+                        <div class="form-group user-tank">
+                            <label class="control-label">Tank</label>
+                            <select name="tank_id" class="form-control tank">
+                                <option value="">Select Tank</option>
+                                @foreach ($tanks as $item)
+                                    <option value="{{$item->id}}">{{$item->name}}</option>                                    
+                                @endforeach
+                            </select>
+                            <span id="edit_tank_error" class="invalid-feedback">
+                                <strong></strong>
+                            </span>
+                        </div>
                         <div class="form-group password-field">
                             <label class="control-label">Password</label>
-                            <input type="password" name="password" id="password" class="form-control" placeholder="Password">
+                            <input type="password" name="password" id="password" class="form-control" placeholder="Password" required>
                             <span id="password_error" class="invalid-feedback">
                                 <strong></strong>
                             </span>
@@ -172,7 +187,7 @@
                             <span id="edit_name_error" class="invalid-feedback">
                                 <strong></strong>
                             </span>
-                        </div>                       
+                        </div>
                         <div class="form-group">
                             <label class="control-label">Unit</label>
                             <select name="unit_id" class="form-control unit">
@@ -182,6 +197,18 @@
                                 @endforeach
                             </select>
                             <span id="edit_unit_error" class="invalid-feedback">
+                                <strong></strong>
+                            </span>
+                        </div>
+                        <div class="form-group user-tank">
+                            <label class="control-label">Tank</label>
+                            <select name="tank_id" class="form-control tank">
+                                <option value="">Select Tank</option>
+                                @foreach ($tanks as $item)
+                                    <option value="{{$item->id}}">{{$item->name}}</option>                                    
+                                @endforeach
+                            </select>
+                            <span id="edit_tank_error" class="invalid-feedback">
                                 <strong></strong>
                             </span>
                         </div>
@@ -219,8 +246,8 @@
                 $("#addModal").modal();
             });
     
-            $("#btn_create").click(function(){  
-                $("#ajax-loading").show();
+            $("#btn_create").click(function(){    
+                $(".page-loader-wrapper").fadeIn();
                 $.ajax({
                     url: "{{route('user.create')}}",
                     type: 'post',
@@ -236,8 +263,8 @@
                         }
                         $("#ajax-loading").hide();
                     },
-                    error: function(data) {
-                        $("#ajax-loading").hide();
+                    error: function(data) {  
+                        $(".page-loader-wrapper").fadeOut();
                         if(data.responseJSON.message == 'The given data was invalid.') {
                             let messages = data.responseJSON.errors;
                             if(messages.name) {
@@ -272,8 +299,16 @@
                 let user_id = $(this).attr("data-id");
                 let username = $(this).parents('tr').find(".username").text().trim();
                 let unit = $(this).parents('tr').find(".unit").data('id');
+                let role = $(this).parents('tr').find(".role").data('id');
+                let tank = $(this).parents('tr').find(".tank").data('id');
     
                 $("#edit_form input.form-control").val('');
+                if(role == '3'){
+                    $("#edit_form .tank").val(tank);
+                    $("#edit_form .user-tank").show();
+                } else {
+                    $("#edit_form .user-tank").hide();
+                }
                 $("#edit_form .id").val(user_id);
                 $("#edit_form .name").val(username);
                 $("#edit_form .unit").val(unit);
@@ -282,7 +317,7 @@
             });
     
             $("#btn_update").click(function(){
-                $("#ajax-loading").show();
+                $(".page-loader-wrapper").fadeIn();
                 $.ajax({
                     url: "{{route('user.edit')}}",
                     type: 'post',
@@ -296,7 +331,7 @@
                         else if(data.message == 'The given data was invalid.') {
                             alert(data.message);
                         }
-                        $("#ajax-loading").hide();
+                        $(".page-loader-wrapper").fadeOut();
                     },
                     error: function(data) {
                         $("#ajax-loading").hide();
@@ -317,6 +352,14 @@
                     }
                 });
             });
+
+            $("#create_role").change(function(){
+                if($(this).val() == 3){
+                    $("#create_form .user-tank").slideDown();
+                }else{
+                    $("#create_form .user-tank").slideUp();
+                }
+            })
     
             $("#btn-reset").click(function(){
                 $("#search_name").val('');

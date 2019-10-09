@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\User;
 use App\Models\Unit;
+use App\Models\Tank;
 
 use Auth;
 use Hash;
@@ -30,6 +31,7 @@ class UserController extends Controller
     {
         config(['site.page' => 'user']);
         $units = Unit::all();
+        $tanks = Tank::all();
         $mod = new User();
         $unit_id = $name = $phone_number = '';
         if ($request->get('unit_id') != ""){
@@ -43,7 +45,7 @@ class UserController extends Controller
         $pagesize = session('pagesize');
         if(!$pagesize){$pagesize = 15;}
         $data = $mod->orderBy('created_at', 'desc')->paginate($pagesize);
-        return view('admin.users', compact('data', 'units', 'unit_id', 'name', 'phone_number'));
+        return view('admin.users', compact('data', 'units', 'tanks', 'unit_id', 'name', 'phone_number'));
     }
 
         
@@ -57,15 +59,17 @@ class UserController extends Controller
     public function updateuser(Request $request){
         $request->validate([
             'name'=>'required',
-            'phone_number'=>'required',
             'password' => 'confirmed',
         ]);
         $user = Auth::user();
         $user->name = $request->get("name");
+        $user->first_name = $request->get("first_name");
+        $user->last_name = $request->get("last_name");
 
         if($request->get('password') != ''){
             $user->password = Hash::make($request->get('password'));
         }
+        
         if($request->has("picture")){
             $picture = request()->file('picture');
             $imageName = time().'.'.$picture->getClientOriginalExtension();
@@ -84,6 +88,9 @@ class UserController extends Controller
         $user = User::find($request->get("id"));
         $user->name = $request->get("name");
         $user->unit_id = $request->get("unit_id");
+        if($user->hasRole('user')){
+            $user->tank_id = $request->get("tank_id");
+        }       
 
         if($request->get('password') != ''){
             $user->password = Hash::make($request->get('password'));
