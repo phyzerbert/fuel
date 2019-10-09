@@ -35,7 +35,7 @@
                             <thead class="">
                                 <tr class="bg-blue">
                                     <th style="width:40px;">#</th>
-                                    <th>Number</th>
+                                    <th>Plate</th>
                                     <th>Fuel Type</th>
                                     <th>Type</th>
                                     <th>Driver</th>
