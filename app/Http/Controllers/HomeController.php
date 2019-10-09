@@ -35,7 +35,7 @@ class HomeController extends Controller
         $vehicles_data = $vehicles->sortByDesc(function ($vehicles) use($period_range, $user) {
                         $mod = $vehicles->unloadings();
                         if($user->unit){
-                            $mod = $mod->where('unit_id', $user_unit_id);
+                            $mod = $mod->where('unit_id', $user->unit_id);
                         }
                         if(count($period_range)){
                             $mod = $mod->whereBetween('unloading_date', $period_range);
