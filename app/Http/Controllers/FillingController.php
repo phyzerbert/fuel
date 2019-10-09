@@ -26,7 +26,10 @@ class FillingController extends Controller
         $users = User::all();
         $user = Auth::user();
         $reference_no = $tank_id = $user_id = $period = '';
-        $mod = new Filling();
+        $mod = new Filling();        
+        if($user->unit){
+            $mod = $user->unit->fillings();
+        }
         if($request->get('reference_no') != ''){
             $reference_no = $request->get('reference_no');
             $mod = $mod->where('reference_no', 'like', "%$reference_no%");
@@ -94,7 +97,7 @@ class FillingController extends Controller
         $item = new Filling();
         $item->reference_no = $data['reference_no'];
         $item->filling_date = $data['date'];
-        // $item->unit_id = $user->unit_id;
+        $item->unit_id = $user->unit_id;
         $item->user_id = $user->id;
         $item->tank_id = $data['tank'];
         $item->amount = $data['amount'];

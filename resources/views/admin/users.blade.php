@@ -39,7 +39,7 @@
                             <button type="submit" class="btn btn-sm btn-primary mb-2"><i class="fa fa-search"></i>&nbsp;&nbsp;Search</button>
                             <button type="button" class="btn btn-sm btn-info mb-2 ml-1" id="btn-reset"><i class="fa fa-eraser"></i>&nbsp;&nbsp;Reset</button>
                         </form>
-                        @if ($role == 'admin')
+                        @if ($role == 'super_admin')
                             <button type="button" class="btn btn-success btn-sm float-right mg-b-5" id="btn-add"><i class="fas fa-plus mr-1"></i> Add New</button>
                         @endif
                     </div>
@@ -49,11 +49,15 @@
                                 <tr class="bg-blue">
                                     <th style="width:40px">#</th>
                                     <th>Username</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
                                     <th>Unit</th>
                                     <th>Role</th>
                                     <th>Tank</th>
                                     <th>Status</th>
-                                    <th style="width:150px">{{__('Action')}}</th>
+                                    @if($role == 'super_admin')
+                                        <th style="width:150px">{{__('Action')}}</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody>                                
@@ -61,6 +65,8 @@
                                     <tr>
                                         <td>{{ (($data->currentPage() - 1 ) * $data->perPage() ) + $loop->iteration }}</td>
                                         <td class="username">{{$item->name}}</td>
+                                        <td class="first_name">{{$item->first_name}}</td>
+                                        <td class="last_name">{{$item->last_name}}</td>
                                         <td class="unit" data-id="{{$item->unit_id}}">@isset($item->unit->name){{$item->unit->name}}@endisset</td>
                                         <td class="role" data-id="{{$item->role_id}}">{{$item->role->name}}</td>
                                         <td class="tank" data-id="{{$item->tank_id}}">@isset($item->tank->name){{$item->tank->name}}@endisset</td>
@@ -70,12 +76,14 @@
                                             @else
                                                 <span class="badge badge-danger">Pending</span>
                                             @endif
-                                        </td>
-                                        <td class="py-1">
-                                            <a href="#" class="btn btn-sm btn-primary btn-icon mr-1 btn-edit" data-id="{{$item->id}}" data-toggle="tooltip" title="Edit"><i class="fa fa-edit"></i></a>
-                                            <a href="{{route('user.delete', $item->id)}}" class="btn btn-sm btn-danger btn-icon mr-1 btn-confirm" onclick="return window.confirm('Are you sure?')" data-toggle="tooltip" title="Delete"><i class="fas fa-trash-alt"></i></a>
-                                            <a href="{{route('user.approve', $item->id)}}" class="btn btn-sm btn-info btn-icon mr-1 btn-approve" onclick="return window.confirm('Are you sure?')" data-toggle="tooltip" title="Approve"><i class="fas fa-check-circle"></i></a>
-                                        </td>
+                                        </td>                                        
+                                        @if($role == 'super_admin')
+                                            <td class="py-1">
+                                                <a href="#" class="btn btn-sm btn-primary btn-icon mr-1 btn-edit" data-id="{{$item->id}}" data-toggle="tooltip" title="Edit"><i class="fa fa-edit"></i></a>
+                                                <a href="{{route('user.delete', $item->id)}}" class="btn btn-sm btn-danger btn-icon mr-1 btn-confirm" onclick="return window.confirm('Are you sure?')" data-toggle="tooltip" title="Delete"><i class="fas fa-trash-alt"></i></a>
+                                                <a href="{{route('user.approve', $item->id)}}" class="btn btn-sm btn-info btn-icon mr-1 btn-approve" onclick="return window.confirm('Are you sure?')" data-toggle="tooltip" title="Approve"><i class="fas fa-check-circle"></i></a>
+                                            </td>
+                                        @endif
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -108,7 +116,7 @@
                         <div class="form-group">
                             <label class="control-label">Username</label>
                             <input class="form-control" type="text" name="name" id="name" placeholder="Username" required />
-                            <span id="name_error" class="invalid-feedback">
+                            <span class="invalid-feedback name_error">
                                 <strong></strong>
                             </span>
                         </div>
@@ -119,51 +127,48 @@
                                 <option value="2">Admin</option>
                                 <option value="3" selected>User</option>
                             </select>
-                            <span id="role_error" class="invalid-feedback">
+                            <span class="invalid-feedback role_error">
                                 <strong></strong>
                             </span>
                         </div>                        
                         <div class="form-group">
                             <label class="control-label">Unit</label>
-                            <select name="unit_id" id="unit_id" class="form-control">
+                            <select name="unit" id="unit" class="form-control">
                                 <option value="">Select Unit</option>
                                 @foreach ($units as $item)
                                     <option value="{{$item->id}}">{{$item->name}}</option>                                    
                                 @endforeach
                             </select>
-                            <span id="unit_error" class="invalid-feedback">
+                            <span class="invalid-feedback unit_error">
                                 <strong></strong>
                             </span>
                         </div>
                         <div class="form-group user-tank">
                             <label class="control-label">Tank</label>
-                            <select name="tank_id" class="form-control tank">
+                            <select name="tank" class="form-control tank">
                                 <option value="">Select Tank</option>
                                 @foreach ($tanks as $item)
                                     <option value="{{$item->id}}">{{$item->name}}</option>                                    
                                 @endforeach
                             </select>
-                            <span id="edit_tank_error" class="invalid-feedback">
+                            <span class="invalid-feedback tank_error">
                                 <strong></strong>
                             </span>
                         </div>
                         <div class="form-group password-field">
                             <label class="control-label">Password</label>
                             <input type="password" name="password" id="password" class="form-control" placeholder="Password" required>
-                            <span id="password_error" class="invalid-feedback">
+                            <span class="invalid-feedback password_error">
                                 <strong></strong>
                             </span>
                         </div>    
                         <div class="form-group password-field">
                             <label class="control-label">Confirm Password</label>
                             <input type="password" name="password_confirmation" id="confirm_password" class="form-control" placeholder="Password Confirm">
-                            <span id="confirm_password_error" class="invalid-feedback">
-                                <strong></strong>
-                            </span>
                         </div>
                     </div>    
                     <div class="modal-footer">
-                        <button type="button" id="btn_create" class="btn btn-primary btn-submit"><i class="fa fa-check-circle-o"></i>&nbsp;Save</button>
+                        <button type="button" class="btn btn-primary btn-submit"><i class="fa fa-check-circle-o"></i>&nbsp;Save</button>
                         <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp;Close</button>
                     </div>
                 </form>
@@ -184,51 +189,48 @@
                         <div class="form-group">
                             <label class="control-label">Username</label>
                             <input class="form-control name" type="text" name="name" placeholder="Username">
-                            <span id="edit_name_error" class="invalid-feedback">
+                            <span class="invalid-feedback name_error">
                                 <strong></strong>
                             </span>
                         </div>
                         <div class="form-group">
                             <label class="control-label">Unit</label>
-                            <select name="unit_id" class="form-control unit">
+                            <select name="unit" class="form-control unit">
                                 <option value="">Select Unit</option>
                                 @foreach ($units as $item)
                                     <option value="{{$item->id}}">{{$item->name}}</option>                                    
                                 @endforeach
                             </select>
-                            <span id="edit_unit_error" class="invalid-feedback">
+                            <span class="invalid-feedback unit_error">
                                 <strong></strong>
                             </span>
                         </div>
                         <div class="form-group user-tank">
                             <label class="control-label">Tank</label>
-                            <select name="tank_id" class="form-control tank">
+                            <select name="tank" class="form-control tank">
                                 <option value="">Select Tank</option>
                                 @foreach ($tanks as $item)
                                     <option value="{{$item->id}}">{{$item->name}}</option>                                    
                                 @endforeach
                             </select>
-                            <span id="edit_tank_error" class="invalid-feedback">
+                            <span class="invalid-feedback tank_error">
                                 <strong></strong>
                             </span>
                         </div>
                         <div class="form-group password-field">
                             <label class="control-label">New Password</label>
                             <input type="password" name="password" class="form-control" placeholder="New Password">
-                            <span id="edit_password_error" class="invalid-feedback">
+                            <span class="invalid-feedback password_error">
                                 <strong></strong>
                             </span>
                         </div>    
                         <div class="form-group password-field">
                             <label class="control-label">Password Confirmation</label>
                             <input type="password" name="password_confirmation" class="form-control" placeholder="Password Confirm">
-                            <span id="edit_confirmpassword_error" class="invalid-feedback">
-                                <strong></strong>
-                            </span>
                         </div>
                     </div>    
                     <div class="modal-footer">
-                        <button type="button" id="btn_update" class="btn btn-primary btn-submit"><i class="fas fa-check-circle"></i>&nbsp;Save</button>
+                        <button type="button" class="btn btn-primary btn-submit"><i class="fas fa-check-circle"></i>&nbsp;Save</button>
                         <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp;Close</button>
                     </div>
                 </form>
@@ -246,7 +248,7 @@
                 $("#addModal").modal();
             });
     
-            $("#btn_create").click(function(){    
+            $("#create_form .btn-submit").click(function(){    
                 $(".page-loader-wrapper").fadeIn();
                 $.ajax({
                     url: "{{route('user.create')}}",
@@ -268,27 +270,33 @@
                         if(data.responseJSON.message == 'The given data was invalid.') {
                             let messages = data.responseJSON.errors;
                             if(messages.name) {
-                                $('#name_error strong').text(data.responseJSON.errors.name[0]);
-                                $('#name_error').show();
-                                $('#create_form #name').focus();
+                                $('#create_form .name_error strong').text(data.responseJSON.errors.name[0]);
+                                $('#create_form .name_error').show();
+                                $('#create_form .name').focus();
                             }
                             
                             if(messages.role) {
-                                $('#role_error strong').text(data.responseJSON.errors.role[0]);
-                                $('#role_error').show();
-                                $('#create_form #role').focus();
+                                $('#create_form .role_error strong').text(data.responseJSON.errors.role[0]);
+                                $('#create_form .role_error').show();
+                                $('#create_form .role').focus();
                             }
                             
-                            if(messages.unit_id) {
-                                $('#unit_error strong').text(data.responseJSON.errors.unit_id[0]);
-                                $('#unit_error').show();
-                                $('#create_form #unit_id').focus();
+                            if(messages.unit) {
+                                $('#create_form .unit_error strong').text(data.responseJSON.errors.unit[0]);
+                                $('#create_form .unit_error').show();
+                                $('#create_form .unit').focus();
+                            }
+                            
+                            if(messages.tank) {
+                                $('#create_form .tank_error strong').text(data.responseJSON.errors.tank[0]);
+                                $('#create_form .tank_error').show();
+                                $('#create_form .tank').focus();
                             }
     
                             if(messages.password) {
-                                $('#password_error strong').text(data.responseJSON.errors.password[0]);
-                                $('#password_error').show();
-                                $('#create_form #password').focus();
+                                $('#create_form .password_error strong').text(data.responseJSON.errors.password[0]);
+                                $('#create_form .password_error').show();
+                                $('#create_form .password').focus();
                             }
                         }
                     }
@@ -316,7 +324,7 @@
                 $("#editModal").modal();
             });
     
-            $("#btn_update").click(function(){
+            $("#edit_form .btn-submit").click(function(){
                 $(".page-loader-wrapper").fadeIn();
                 $.ajax({
                     url: "{{route('user.edit')}}",
@@ -338,15 +346,27 @@
                         if(data.responseJSON.message == 'The given data was invalid.') {
                             let messages = data.responseJSON.errors;
                             if(messages.name) {
-                                $('#edit_name_error strong').text(data.responseJSON.errors.name[0]);
-                                $('#edit_name_error').show();
-                                $('#edit_form #edit_name').focus();
+                                $('#edit_form .name_error strong').text(data.responseJSON.errors.name[0]);
+                                $('#edit_form .name_error').show();
+                                $('#edit_form .form .name').focus();
+                            }
+                            
+                            if(messages.unit) {
+                                $('#edit_form .unit_error strong').text(data.responseJSON.errors.unit[0]);
+                                $('#edit_form .unit_error').show();
+                                $('#edit_form .unit').focus();
+                            }
+                            
+                            if(messages.tank) {
+                                $('#edit_form .tank_error strong').text(data.responseJSON.errors.tank[0]);
+                                $('#edit_form .tank_error').show();
+                                $('#edit_form .tank').focus();
                             }
         
                             if(messages.password) {
-                                $('#edit_password_error strong').text(data.responseJSON.errors.password[0]);
-                                $('#edit_password_error').show();
-                                $('#edit_form #edit_password').focus();
+                                $('#edit_form .password_error strong').text(data.responseJSON.errors.password[0]);
+                                $('#edit_form .password_error').show();
+                                $('#edit_form .password').focus();
                             }
                         }
                     }

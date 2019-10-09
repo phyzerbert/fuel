@@ -11,4 +11,16 @@ class Unit extends Model
     public function users(){
         return $this->hasMany('App\User');
     }
+
+    public function unloadings(){
+        return $this->hasMany(Unloading::class);
+    }
+
+    public function fillings(){
+        return $this->hasMany(Filling::class);
+    }
+
+    public function tanks(){
+        return $this->hasMany(Tank::class);
+    }
 }

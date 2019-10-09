@@ -29,7 +29,9 @@ class UnloadingController extends Controller
         $user_vehicles = Vehicle::all();
         $reference_no = $tank_id = $vehicle_id = $user_id = $period = '';
         $mod = new Unloading();
-
+        if($user->unit){
+            $mod = $user->unit->unloadings();
+        }
         if($user->hasRole('user')){
             if($user->tank){
                 $user_vehicles = Vehicle::where('fuel_id', $user->tank->fuel_id)->get();

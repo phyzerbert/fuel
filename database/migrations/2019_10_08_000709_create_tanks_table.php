@@ -16,6 +16,7 @@ class CreateTanksTable extends Migration
         Schema::create('tanks', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name')->nullable();
+            $table->integer('unit_id')->nullable();
             $table->integer('fuel_id')->nullable();
             $table->integer('capacity')->default(20000);
             $table->integer('low_level')->default(5000);

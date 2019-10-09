@@ -30,10 +30,14 @@ class UserController extends Controller
     public function index(Request $request)
     {
         config(['site.page' => 'user']);
+        $user = Auth::user();
         $units = Unit::all();
         $tanks = Tank::all();
         $mod = new User();
-        $unit_id = $name = $phone_number = '';
+        if($user->unit){
+            $mod = $user->unit->users();
+        }
+        $unit_id = $name = '';
         if ($request->get('unit_id') != ""){
             $unit_id = $request->get('unit_id');
             $mod = $mod->where('unit_id', "$unit_id");
@@ -69,7 +73,7 @@ class UserController extends Controller
         if($request->get('password') != ''){
             $user->password = Hash::make($request->get('password'));
         }
-        
+
         if($request->has("picture")){
             $picture = request()->file('picture');
             $imageName = time().'.'.$picture->getClientOriginalExtension();
@@ -81,16 +85,25 @@ class UserController extends Controller
     }
 
     public function edituser(Request $request){
-        $request->validate([
-            'name'=>'required',
-            'password' => 'confirmed',
-        ]);
+        $validate_array = array(
+            'name'=>'required|string|unique:users',
+            'password'=>'confirmed'
+        );
         $user = User::find($request->get("id"));
-        $user->name = $request->get("name");
-        $user->unit_id = $request->get("unit_id");
+        if($user->hasRole('admin')){
+            $validate_array['unit'] = 'required';
+        }
         if($user->hasRole('user')){
-            $user->tank_id = $request->get("tank_id");
-        }       
+            $validate_array['unit'] = 'required';
+            $validate_array['tank'] = 'required';
+        }
+        $request->validate($validate_array);
+        
+        $user->name = $request->get("name");
+        $user->unit_id = $request->get("unit");
+        $user->first_name = $request->get("first_name");
+        $user->last_name = $request->get("last_name");
+        $user->tank_id = $request->get("tank");
 
         if($request->get('password') != ''){
             $user->password = Hash::make($request->get('password'));
@@ -100,15 +113,26 @@ class UserController extends Controller
     }
 
     public function create(Request $request){
-        $request->validate([
+        $validate_array = array(
             'name'=>'required|string|unique:users',
             'role'=>'required',
             'password'=>'required|string|min:6|confirmed'
-        ]);
+        );
+        if($request->get('role') == 2){
+            $validate_array['unit'] = 'required';
+        }
+        if($request->get('role') == 3){
+            $validate_array['unit'] = 'required';
+            $validate_array['tank'] = 'required';
+        }
+        $request->validate($validate_array);
         
         User::create([
             'name' => $request->get('name'),
-            'unit_id' => $request->get('unit_id'),
+            'first_name' => $request->get('first_name'),
+            'last_name' => $request->get('last_name'),
+            'unit_id' => $request->get('unit'),
+            'tank_id' => $request->get('tank'),
             'role_id' => $request->get('role'),
             'password' => Hash::make($request->get('password'))
         ]);

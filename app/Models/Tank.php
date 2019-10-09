@@ -19,4 +19,8 @@ class Tank extends Model
     public function fillings(){
         return $this->hasMany(Filling::class);
     }
+
+    public function unit() {
+        return $this->belongsTo(Unit::class);
+    }
 }
