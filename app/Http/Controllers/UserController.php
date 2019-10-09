@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\User;
-use App\Models\Unit;
+use App\Models\Location;
 use App\Models\Tank;
 
 use Auth;
@@ -31,25 +31,30 @@ class UserController extends Controller
     {
         config(['site.page' => 'user']);
         $user = Auth::user();
-        $units = Unit::all();
+        $locations = Location::all();
         $tanks = Tank::all();
         $mod = new User();
-        if($user->unit){
-            $mod = $user->unit->users();
+        $name = $location_id = $tank_id = '';
+        if($request->location_id != ''){
+            $location_id = $request->get('location_id');
+            $mod = $mod->where('location_id', $location_id);
         }
-        $unit_id = $name = '';
-        if ($request->get('unit_id') != ""){
-            $unit_id = $request->get('unit_id');
-            $mod = $mod->where('unit_id', "$unit_id");
+        if($request->tank_id != ''){
+            $tank_id = $request->get('tank_id');
+            $tank = Tank::find($tank_id);
+            $mod = $mod->where('id', $tank->user_id);
         }
         if ($request->get('name') != ""){
             $name = $request->get('name');
-            $mod = $mod->where('name', 'LIKE', "%$name%");
+            $mod = $mod->where(function($query) use($name) {
+                return $query->where('name', 'LIKE', "%$name%")
+                            ->orWhere('surname', 'LIKE', "%$name%");
+            });                    
         }
         $pagesize = session('pagesize');
         if(!$pagesize){$pagesize = 15;}
         $data = $mod->orderBy('created_at', 'desc')->paginate($pagesize);
-        return view('admin.users', compact('data', 'units', 'tanks', 'unit_id', 'name', 'phone_number'));
+        return view('admin.users', compact('data', 'locations', 'tanks', 'location_id', 'tank_id', 'name'));
     }
 
         
@@ -67,8 +72,8 @@ class UserController extends Controller
         ]);
         $user = Auth::user();
         $user->name = $request->get("name");
-        $user->first_name = $request->get("first_name");
-        $user->last_name = $request->get("last_name");
+        $user->surname = $request->get("surname");
+        $user->location_id = $request->get("location_id");
 
         if($request->get('password') != ''){
             $user->password = Hash::make($request->get('password'));
@@ -86,29 +91,24 @@ class UserController extends Controller
 
     public function edituser(Request $request){
         $validate_array = array(
-            'name'=>'required|string|unique:users',
+            'name'=>'required|string',
             'password'=>'confirmed'
         );
         $user = User::find($request->get("id"));
-        if($user->hasRole('admin')){
-            $validate_array['unit'] = 'required';
-        }
         if($user->hasRole('user')){
-            $validate_array['unit'] = 'required';
             $validate_array['tank'] = 'required';
         }
         $request->validate($validate_array);
         
         $user->name = $request->get("name");
-        $user->unit_id = $request->get("unit");
-        $user->first_name = $request->get("first_name");
-        $user->last_name = $request->get("last_name");
-        $user->tank_id = $request->get("tank");
+        $user->surname = $request->get("surname");
+        $user->location_id = $request->get("location");
 
         if($request->get('password') != ''){
             $user->password = Hash::make($request->get('password'));
         }
         $user->save();
+        Tank::find($request->tank)->update(['user_id' => $user->id]);
         return response()->json('success');
     }
 
@@ -118,24 +118,19 @@ class UserController extends Controller
             'role'=>'required',
             'password'=>'required|string|min:6|confirmed'
         );
-        if($request->get('role') == 2){
-            $validate_array['unit'] = 'required';
-        }
         if($request->get('role') == 3){
-            $validate_array['unit'] = 'required';
             $validate_array['tank'] = 'required';
         }
         $request->validate($validate_array);
         
-        User::create([
-            'name' => $request->get('name'),
-            'first_name' => $request->get('first_name'),
-            'last_name' => $request->get('last_name'),
-            'unit_id' => $request->get('unit'),
-            'tank_id' => $request->get('tank'),
-            'role_id' => $request->get('role'),
-            'password' => Hash::make($request->get('password'))
-        ]);
+        $user = User::create([
+                'name' => $request->get('name'),
+                'surname' => $request->get('surname'),
+                'location_id' => $request->get('location'),
+                'role_id' => $request->get('role'),
+                'password' => Hash::make($request->get('password'))
+            ]);
+        Tank::find($request->tank)->update(['user_id' => $user->id]);
         return response()->json('success');
     }
 

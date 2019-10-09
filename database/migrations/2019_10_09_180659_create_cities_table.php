@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTanksTable extends Migration
+class CreateCitiesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,9 @@ class CreateTanksTable extends Migration
      */
     public function up()
     {
-        Schema::create('tanks', function (Blueprint $table) {
+        Schema::create('cities', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('name')->nullable();
-            $table->integer('fuel_id')->nullable();
-            $table->integer('capacity')->default(20000);
-            $table->string('location_id')->nullable();
-            $table->integer('user_id')->nullable();
+            $table->string('name');
             $table->timestamps();
         });
     }
@@ -31,6 +27,6 @@ class CreateTanksTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tanks');
+        Schema::dropIfExists('cities');
     }
 }

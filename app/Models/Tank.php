@@ -20,7 +20,11 @@ class Tank extends Model
         return $this->hasMany(Filling::class);
     }
 
-    public function unit() {
-        return $this->belongsTo(Unit::class);
+    public function location() {
+        return $this->belongsTo(Location::class);
+    }
+
+    public function user() {
+        return $this->belongsTo('App\User');
     }
 }

@@ -30,10 +30,10 @@
                         <form action="" method="POST" class="form-inline float-left" id="searchForm">
                             @csrf
                             <input type="text" class="form-control form-control-sm mr-sm-2 mb-2" name="name" id="search_name" value="{{$name}}" placeholder="Name">
-                            <select class="form-control form-control-sm mr-sm-2 mb-2" name="unit_id" id="search_unit">
-                                <option value="" hidden>Select Unit</option>
-                                @foreach ($units as $item)
-                                    <option value="{{$item->id}}" @if ($unit_id == $item->id) selected @endif>{{$item->name}}</option>
+                            <select class="form-control form-control-sm mr-sm-2 mb-2" name="location_id" id="search_location">
+                                <option value="" hidden>Select Location</option>
+                                @foreach ($locations as $item)
+                                    <option value="{{$item->id}}" @if ($location_id == $item->id) selected @endif>{{$item->name}}</option>
                                 @endforeach        
                             </select>                        
                             <button type="submit" class="btn btn-sm btn-primary mb-2"><i class="fa fa-search"></i>&nbsp;&nbsp;Search</button>
@@ -49,13 +49,12 @@
                                 <tr class="bg-blue">
                                     <th style="width:40px">#</th>
                                     <th>Username</th>
-                                    <th>First Name</th>
-                                    <th>Last Name</th>
-                                    <th>Unit</th>
+                                    <th>Surname</th>
+                                    <th>Location</th>
                                     <th>Role</th>
                                     <th>Tank</th>
                                     <th>Status</th>
-                                    @if($role == 'super_admin')
+                                    @if($role == 'admin')
                                         <th style="width:150px">{{__('Action')}}</th>
                                     @endif
                                 </tr>
@@ -65,11 +64,10 @@
                                     <tr>
                                         <td>{{ (($data->currentPage() - 1 ) * $data->perPage() ) + $loop->iteration }}</td>
                                         <td class="username">{{$item->name}}</td>
-                                        <td class="first_name">{{$item->first_name}}</td>
-                                        <td class="last_name">{{$item->last_name}}</td>
-                                        <td class="unit" data-id="{{$item->unit_id}}">@isset($item->unit->name){{$item->unit->name}}@endisset</td>
+                                        <td class="surname">{{$item->surname}}</td>
+                                        <td class="location" data-id="{{$item->location_id}}">@isset($item->location->city){{$item->location->city->name}}, {{$item->location->district}}@endisset</td>
                                         <td class="role" data-id="{{$item->role_id}}">{{$item->role->name}}</td>
-                                        <td class="tank" data-id="{{$item->tank_id}}">@isset($item->tank->name){{$item->tank->name}}@endisset</td>
+                                        <td class="tank" data-id="@if($item->tank){{$item->tank->id}}@endif">@isset($item->tank->name){{$item->tank->name}}@endisset</td>
                                         <td class="status" data-id="{{$item->status}}">
                                             @if($item->status == 1)
                                                 <span class="badge badge-primary">Approved</span>
@@ -77,7 +75,7 @@
                                                 <span class="badge badge-danger">Pending</span>
                                             @endif
                                         </td>                                        
-                                        @if($role == 'super_admin')
+                                        @if($role == 'admin')
                                             <td class="py-1">
                                                 <a href="#" class="btn btn-sm btn-primary btn-icon mr-1 btn-edit" data-id="{{$item->id}}" data-toggle="tooltip" title="Edit"><i class="fa fa-edit"></i></a>
                                                 <a href="{{route('user.delete', $item->id)}}" class="btn btn-sm btn-danger btn-icon mr-1 btn-confirm" onclick="return window.confirm('Are you sure?')" data-toggle="tooltip" title="Delete"><i class="fas fa-trash-alt"></i></a>
@@ -93,7 +91,7 @@
                                 <p>Total <strong style="color: red">{{ $data->total() }}</strong> Items</p>
                             </div>
                             <div class="float-right" style="margin: 0;">
-                                {!! $data->appends(['name' => $name, 'unit_id' => $unit_id])->links() !!}
+                                {!! $data->appends(['name' => $name, 'location_id' => $location_id])->links() !!}
                             </div>
                         </div>
                     </div>
@@ -114,15 +112,22 @@
                     @csrf
                     <div class="modal-body">
                         <div class="form-group">
-                            <label class="control-label">Username</label>
-                            <input class="form-control" type="text" name="name" id="name" placeholder="Username" required />
+                            <label class="control-label">Name</label>
+                            <input class="form-control name" type="text" name="name" placeholder="Name" required />
                             <span class="invalid-feedback name_error">
                                 <strong></strong>
                             </span>
                         </div>
                         <div class="form-group">
+                            <label class="control-label">Surname</label>
+                            <input class="form-control surname" type="text" name="surname" placeholder="Surname" />
+                            <span class="invalid-feedback surname_error">
+                                <strong></strong>
+                            </span>
+                        </div>
+                        <div class="form-group">
                             <label class="control-label">Role</label>
-                            <select name="role" id="create_role" class="form-control" required>
+                            <select name="role" id="create_role" class="form-control role" required>
                                 <option value="1">SuperAdmin</option>
                                 <option value="2">Admin</option>
                                 <option value="3" selected>User</option>
@@ -132,14 +137,14 @@
                             </span>
                         </div>                        
                         <div class="form-group">
-                            <label class="control-label">Unit</label>
-                            <select name="unit" id="unit" class="form-control">
-                                <option value="">Select Unit</option>
-                                @foreach ($units as $item)
-                                    <option value="{{$item->id}}">{{$item->name}}</option>                                    
+                            <label class="control-label">Location</label>
+                            <select name="location" class="form-control location">
+                                <option value="">Select Location</option>
+                                @foreach ($locations as $item)
+                                    <option value="{{$item->id}}">{{$item->city->name}}, {{$item->district}}</option>                                    
                                 @endforeach
                             </select>
-                            <span class="invalid-feedback unit_error">
+                            <span class="invalid-feedback location_error">
                                 <strong></strong>
                             </span>
                         </div>
@@ -157,7 +162,7 @@
                         </div>
                         <div class="form-group password-field">
                             <label class="control-label">Password</label>
-                            <input type="password" name="password" id="password" class="form-control" placeholder="Password" required>
+                            <input type="password" name="password" class="form-control password" placeholder="Password" required>
                             <span class="invalid-feedback password_error">
                                 <strong></strong>
                             </span>
@@ -194,14 +199,21 @@
                             </span>
                         </div>
                         <div class="form-group">
-                            <label class="control-label">Unit</label>
-                            <select name="unit" class="form-control unit">
-                                <option value="">Select Unit</option>
-                                @foreach ($units as $item)
-                                    <option value="{{$item->id}}">{{$item->name}}</option>                                    
+                            <label class="control-label">Surname</label>
+                            <input class="form-control surname" type="text" name="surname" placeholder="Surname" />
+                            <span class="invalid-feedback surname_error">
+                                <strong></strong>
+                            </span>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Location</label>
+                            <select name="location" class="form-control location">
+                                <option value="">Select Location</option>
+                                @foreach ($locations as $item)
+                                    <option value="{{$item->id}}">{{$item->city->name}}, {{$item->district}}</option>                                    
                                 @endforeach
                             </select>
-                            <span class="invalid-feedback unit_error">
+                            <span class="invalid-feedback location_error">
                                 <strong></strong>
                             </span>
                         </div>
@@ -219,7 +231,7 @@
                         </div>
                         <div class="form-group password-field">
                             <label class="control-label">New Password</label>
-                            <input type="password" name="password" class="form-control" placeholder="New Password">
+                            <input type="password" name="password" class="form-control password" placeholder="New Password">
                             <span class="invalid-feedback password_error">
                                 <strong></strong>
                             </span>
@@ -281,10 +293,10 @@
                                 $('#create_form .role').focus();
                             }
                             
-                            if(messages.unit) {
-                                $('#create_form .unit_error strong').text(data.responseJSON.errors.unit[0]);
-                                $('#create_form .unit_error').show();
-                                $('#create_form .unit').focus();
+                            if(messages.location) {
+                                $('#create_form .location_error strong').text(data.responseJSON.errors.location[0]);
+                                $('#create_form .location_error').show();
+                                $('#create_form .location').focus();
                             }
                             
                             if(messages.tank) {
@@ -306,12 +318,13 @@
             $(".btn-edit").click(function(){
                 let user_id = $(this).attr("data-id");
                 let username = $(this).parents('tr').find(".username").text().trim();
-                let unit = $(this).parents('tr').find(".unit").data('id');
+                let surname = $(this).parents('tr').find(".surname").text().trim();
+                let location = $(this).parents('tr').find(".location").data('id');
                 let role = $(this).parents('tr').find(".role").data('id');
                 let tank = $(this).parents('tr').find(".tank").data('id');
     
                 $("#edit_form input.form-control").val('');
-                if(role == '3'){
+                if(role == '2'){
                     $("#edit_form .tank").val(tank);
                     $("#edit_form .user-tank").show();
                 } else {
@@ -319,7 +332,9 @@
                 }
                 $("#edit_form .id").val(user_id);
                 $("#edit_form .name").val(username);
-                $("#edit_form .unit").val(unit);
+                $("#edit_form .surname").val(surname);
+                $("#edit_form .location").val(location);
+                $("#edit_form .tank").val(tank);
     
                 $("#editModal").modal();
             });
@@ -339,10 +354,9 @@
                         else if(data.message == 'The given data was invalid.') {
                             alert(data.message);
                         }
-                        $(".page-loader-wrapper").fadeOut();
                     },
                     error: function(data) {
-                        $("#ajax-loading").hide();
+                        $(".page-loader-wrapper").fadeOut();
                         if(data.responseJSON.message == 'The given data was invalid.') {
                             let messages = data.responseJSON.errors;
                             if(messages.name) {
@@ -351,10 +365,10 @@
                                 $('#edit_form .form .name').focus();
                             }
                             
-                            if(messages.unit) {
-                                $('#edit_form .unit_error strong').text(data.responseJSON.errors.unit[0]);
-                                $('#edit_form .unit_error').show();
-                                $('#edit_form .unit').focus();
+                            if(messages.location) {
+                                $('#edit_form .location_error strong').text(data.responseJSON.errors.location[0]);
+                                $('#edit_form .location_error').show();
+                                $('#edit_form .location').focus();
                             }
                             
                             if(messages.tank) {
@@ -374,7 +388,7 @@
             });
 
             $("#create_role").change(function(){
-                if($(this).val() == 3){
+                if($(this).val() == 2){
                     $("#create_form .user-tank").slideDown();
                 }else{
                     $("#create_form .user-tank").slideUp();
@@ -383,7 +397,7 @@
     
             $("#btn-reset").click(function(){
                 $("#search_name").val('');
-                $("#search_unit").val('');
+                $("#search_location").val('');
             });   
             
             $("#pagesize").change(function(){

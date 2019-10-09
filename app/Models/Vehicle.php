@@ -15,4 +15,12 @@ class Vehicle extends Model
     public function unloadings(){
         return $this->hasMany(Unloading::class);
     }
+
+    public function type(){
+        return $this->belongsTo(VehicleType::class, 'vehicle_type_id');
+    }
+
+    public function driver(){
+        return $this->belongsTo(Driver::class);
+    }
 }

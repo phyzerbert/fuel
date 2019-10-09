@@ -54,10 +54,30 @@ Route::post('/vehicle/create', 'VehicleController@create')->name('vehicle.create
 Route::post('/vehicle/edit', 'VehicleController@edit')->name('vehicle.edit');
 Route::get('/vehicle/delete/{id}', 'VehicleController@delete')->name('vehicle.delete');
 
+Route::any('/driver/index', 'DriverController@index')->name('driver.index');
+Route::post('/driver/create', 'DriverController@create')->name('driver.create');
+Route::post('/driver/edit', 'DriverController@edit')->name('driver.edit');
+Route::get('/driver/delete/{id}', 'DriverController@delete')->name('driver.delete');
+
 Route::any('/tank/index', 'TankController@index')->name('tank.index');
 Route::post('/tank/create', 'TankController@create')->name('tank.create');
 Route::post('/tank/edit', 'TankController@edit')->name('tank.edit');
 Route::get('/tank/delete/{id}', 'TankController@delete')->name('tank.delete');
+
+Route::any('/location/index', 'LocationController@index')->name('location.index');
+Route::post('/location/create', 'LocationController@create')->name('location.create');
+Route::post('/location/edit', 'LocationController@edit')->name('location.edit');
+Route::get('/location/delete/{id}', 'LocationController@delete')->name('location.delete');
+
+Route::any('/city/index', 'LocationController@city_index')->name('city.index');
+Route::post('/city/create', 'LocationController@city_create')->name('city.create');
+Route::post('/city/edit', 'LocationController@city_edit')->name('city.edit');
+Route::get('/city/delete/{id}', 'LocationController@city_delete')->name('city.delete');
+
+Route::any('/vehicle_type/index', 'VehicleTypeController@index')->name('vehicle_type.index');
+Route::post('/vehicle_type/create', 'VehicleTypeController@create')->name('vehicle_type.create');
+Route::post('/vehicle_type/edit', 'VehicleTypeController@edit')->name('vehicle_type.edit');
+Route::get('/vehicle_type/delete/{id}', 'VehicleTypeController@delete')->name('vehicle_type.delete');
 
 
 Route::post('/set_pagesize', 'HomeController@set_pagesize')->name('set_pagesize');

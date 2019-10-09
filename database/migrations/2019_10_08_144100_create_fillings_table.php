@@ -16,11 +16,11 @@ class CreateFillingsTable extends Migration
         Schema::create('fillings', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('reference_no')->nullable();
+            $table->dateTime('timestamp')->nullable();
             $table->integer('unit_id')->nullable();
             $table->integer('user_id')->nullable();
             $table->integer('tank_id')->nullable();
             $table->integer('amount')->nullable();
-            $table->date('filling_date')->nullable();
             $table->string('attachment')->nullable();
             $table->text('description')->nullable();
             $table->integer('status')->default(0);

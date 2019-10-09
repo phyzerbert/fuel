@@ -34,13 +34,13 @@
                                 <tr class="bg-blue">
                                     <th style="width:40px;">#</th>
                                     <th>Name</th>
-                                    <th>Fuel Type</th>
+                                    <th>Type Of Fuel</th>
                                     <th>Capacity</th>
-                                    <th>Low Level</th>
+                                    <th>Location</th>
+                                    <th>User</th>
                                     <th>Filling</th>
                                     <th>Unloading</th>
                                     <th>Balance</th>
-                                    <th>Description</th>
                                     <th style="width:150px;">Action</th>
                                 </tr>
                             </thead>
@@ -62,11 +62,11 @@
                                         <td class="name">{{$item->name}}</td>
                                         <td class="fuel" data-id="{{$item->fuel_id}}">{{$item->fuel->name}}</td>
                                         <td class="capacity" data-value="{{$item->capacity}}">{{number_format($item->capacity)}}</td>
-                                        <td class="low_level" data-value="{{$item->low_level}}">{{number_format($item->low_level)}}</td>
+                                        <td class="location" data-id="{{$item->location_id}}">@if($item->location){{$item->location->city->name}}, {{$item->location->district}}@endif</td>
+                                        <td class="user" data-id="{{$item->user_id}}">@if($item->user){{$item->user->name}}@endif</td>
                                         <td class="filling">{{number_format($filling)}}</td>
                                         <td class="unloading">{{number_format($unloading)}}</td>
                                         <td class="balance">{{number_format($balance)}}</td>
-                                        <td class="description">{{$item->description}}</td>
                                         <td class="py-1">
                                             <a href="#" class="btn btn-sm btn-primary btn-icon mr-1 btn-edit" data-id="{{$item->id}}" data-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i></a>
                                             <a href="{{route('tank.delete', $item->id)}}" class="btn btn-sm btn-danger btn-icon" data-id="{{$item->id}}" onclick="return window.confirm('Are you sure?')" data-toggle="tooltip" data-placement="top" title="Delete"><i class="fas fa-trash-alt"></i></a>
@@ -76,7 +76,7 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <th colspan="5"></th>
+                                    <th colspan="6"></th>
                                     <th>{{number_format($footer_filling)}}</th>
                                     <th>{{number_format($footer_unloading)}}</th>
                                     <th>{{number_format($footer_balance)}}</th>
@@ -118,14 +118,27 @@
                             <label class="control-label">Capacity</label>
                             <input class="form-control name" type="number" name="capacity" min="0" value="20000" placeholder="Capacity" />
                         </div>
+
                         <div class="form-group">
-                            <label class="control-label">Low Level</label>
-                            <input class="form-control name" type="number" name="low_level" min="0" value="5000" placeholder="Low Level" />
+                            <label class="control-label">Location</label>
+                            <select name="location" class="form-control location">
+                                <option value="" hidden>Location</option>
+                                @foreach ($locations as $item)
+                                    <option value="{{$item->id}}">{{$item->city->name}}, {{$item->district}}</option>
+                                @endforeach
+                            </select>
                         </div>
+                        
                         <div class="form-group">
-                            <label class="control-label">Description</label>
-                            <textarea class="form-control name" rows="3" name="description" placeholder="Description"></textarea>
+                            <label class="control-label">User</label>
+                            <select name="user" class="form-control user">
+                                <option value="" hidden>Select User</option>
+                                @foreach ($users as $item)
+                                    <option value="{{$item->id}}">{{$item->name}}</option>
+                                @endforeach
+                            </select>
                         </div>
+                        
                     </div>
                     <div class="modal-footer">
                         <button type="submit" id="btn_create" class="btn btn-primary btn-submit"><i class="fas fa-check-circle mr-1"></i>&nbsp;Save</button>
@@ -159,17 +172,30 @@
                                 @endforeach
                             </select>
                         </div>
+
                         <div class="form-group">
                             <label class="control-label">Capacity</label>
                             <input class="form-control capacity" type="number" name="capacity" min="0" value="20000" placeholder="Capacity" />
                         </div>
+
                         <div class="form-group">
-                            <label class="control-label">Low Level</label>
-                            <input class="form-control low_level" type="number" name="low_level" min="0" value="5000" placeholder="Low Level" />
+                            <label class="control-label">Location</label>
+                            <select name="location" class="form-control location">
+                                <option value="" hidden>Location</option>
+                                @foreach ($locations as $item)
+                                    <option value="{{$item->id}}">{{$item->city->name}}, {{$item->district}}</option>
+                                @endforeach
+                            </select>
                         </div>
+                        
                         <div class="form-group">
-                            <label class="control-label">Description</label>
-                            <textarea class="form-control description" rows="3" name="description" placeholder="Description"></textarea>
+                            <label class="control-label">User</label>
+                            <select name="user" class="form-control user">
+                                <option value="" hidden>Select User</option>
+                                @foreach ($users as $item)
+                                    <option value="{{$item->id}}">{{$item->name}}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -198,18 +224,17 @@
             let name = $(this).parents('tr').find(".name").text().trim();
             let fuel = $(this).parents('tr').find(".fuel").data('id');
             let capacity = $(this).parents('tr').find(".capacity").data('value');
-            let low_level = $(this).parents('tr').find(".low_level").data('value');
-            let description = $(this).parents('tr').find(".description").text().trim();
+            let location = $(this).parents('tr').find(".location").data('id');
+            let user = $(this).parents('tr').find(".user").data('id');
             $("#edit_form input.form-control").val('');
             $("#editModal .id").val(id);
             $("#editModal .name").val(name);
             $("#editModal .fuel").val(fuel).change();
             $("#editModal .capacity").val(capacity);
-            $("#editModal .low_level").val(low_level);
-            $("#editModal .description").val(description);
+            $("#editModal .location").val(location);
+            $("#editModal .user").val(user);
             $("#editModal").modal();
         });
-
     });
 </script>
 @endsection

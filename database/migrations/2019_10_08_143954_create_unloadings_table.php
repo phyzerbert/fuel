@@ -16,12 +16,15 @@ class CreateUnloadingsTable extends Migration
         Schema::create('unloadings', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('reference_no')->nullable();
-            $table->integer('unit_id')->nullable();
+            $table->dateTime('timestamp')->nullable();
             $table->integer('user_id')->nullable();
             $table->integer('tank_id')->nullable();
             $table->integer('vehicle_id')->nullable();
+            $table->integer('driver_id')->nullable();
+            $table->integer('first_km_hr')->nullable();
+            $table->integer('last_km_hr')->nullable();
+            $table->integer('diff_km_hr')->nullable();
             $table->integer('amount')->nullable();
-            $table->date('unloading_date')->nullable();
             $table->string('attachment')->nullable();
             $table->text('description')->nullable();
             $table->integer('status')->default(0);

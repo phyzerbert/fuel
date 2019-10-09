@@ -29,16 +29,18 @@
                         <button type="button" class="btn btn-success btn-sm float-right mg-b-5" id="btn-add"><i class="fas fa-plus mr-1"></i>Add New</button>
                     </div>
                     <div class="table-responsive mt-2">
-                        <table class="table table-bordered table-hover">
+                        <table class="table table-bordered table-hover mb-5">
                             <thead class="">
                                 <tr class="bg-blue">
                                     <th style="width:40px;">#</th>
                                     <th>Plate</th>
-                                    <th>Fuel Type</th>
-                                    <th>Type</th>
+                                    <th>Model</th>
+                                    <th>Brand</th>
+                                    <th>Type Of Vehicle</th>
+                                    <th>Type Of Fuel</th>
+                                    <th>Capacity</th>
                                     <th>Driver</th>
                                     <th>Unloading Amount</th>
-                                    <th>Description</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -49,12 +51,14 @@
                                     @endphp
                                     <tr>
                                         <td>{{ $loop->index + 1 }}</td>
-                                        <td class="number">{{$item->number}}</td>
+                                        <td class="plate">{{$item->plate}}</td>
+                                        <td class="model">{{$item->model}}</td>
+                                        <td class="brand">{{$item->brand}}</td>
+                                        <td class="type" data-id="{{$item->vehicle_type_id}}">@if($item->type->name){{$item->type->name}}@endif</td>
                                         <td class="fuel" data-id="{{$item->fuel_id}}">@if($item->fuel){{$item->fuel->name}}@endif</td>
-                                        <td class="type">{{$item->type}}</td>
-                                        <td class="driver">{{$item->driver}}</td>
-                                        <td class="description">{{number_format($unloading)}}</td>
-                                        <td class="description">{{$item->description}}</td>
+                                        <td class="capacity">{{$item->capacity}}</td>
+                                        <td class="driver" data-id="{{$item->driver_id}}">@isset($item->driver){{$item->driver->name}}@endif</td>
+                                        <td class="unloading">{{number_format($unloading)}}</td>
                                         <td class="py-1">
                                             <a href="#" class="btn btn-sm btn-primary btn-icon mr-1 btn-edit" data-id="{{$item->id}}" data-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i></a>
                                             <a href="{{route('vehicle.delete', $item->id)}}" class="btn btn-sm btn-danger btn-icon" data-id="{{$item->id}}" onclick="return window.confirm('Are you sure?')" data-toggle="tooltip" title="Delete"><i class="fas fa-trash-alt"></i></a>
@@ -81,29 +85,47 @@
                     @csrf
                     <div class="modal-body">
                         <div class="form-group">
-                            <label class="control-label">Number</label>
-                            <input class="form-control number" type="text" name="number" placeholder="Number">
+                            <label class="control-label">Plate</label>
+                            <input class="form-control plate" type="text" name="plate" placeholder="Plate" required />
                         </div>
                         <div class="form-group">
-                            <label class="control-label">Fuel Type</label>
-                            <select name="fuel" id="" class="form-control">
-                                <option value="" hidden>Fuel Type</option>
+                            <label class="control-label">Model</label>
+                            <input class="form-control model" type="text" name="model" placeholder="Model" />
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Brand</label>
+                            <input class="form-control brand" type="text" name="brand" placeholder="Brand" />
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Type Of Vehicle</label>
+                            <select name="type" id="" class="form-control type" required>
+                                <option value="" hidden>Type Of Vehicle</option>
+                                @foreach ($vehicle_types as $item)
+                                    <option value="{{$item->id}}">{{$item->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Type Of Fuel</label>
+                            <select name="fuel" id="" class="form-control fuel" required>
+                                <option value="" hidden>Type Of Fuel</option>
                                 @foreach ($fuels as $item)
                                     <option value="{{$item->id}}">{{$item->name}}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="form-group">
-                            <label class="control-label">Type</label>
-                            <input class="form-control type" type="text" name="type" placeholder="Vehicle Type">
+                            <label class="control-label">Capacity</label>
+                            <input class="form-control capacity" type="number" min="0" name="capacity" placeholder="Capacity" />
                         </div>
                         <div class="form-group">
                             <label class="control-label">Driver</label>
-                            <input class="form-control driver" type="text" name="driver" placeholder="Driver">
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label">Description</label>
-                            <textarea class="form-control name" rows="3" name="description" placeholder="Description"></textarea>
+                            <select name="driver" id="" class="form-control driver">
+                                <option value="" hidden>Select Driver</option>
+                                @foreach ($drivers as $item)
+                                    <option value="{{$item->id}}">{{$item->name}}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>    
                     <div class="modal-footer">
@@ -126,29 +148,47 @@
                     <input type="hidden" name="id" class="id">
                     <div class="modal-body">
                         <div class="form-group">
-                            <label class="control-label">Number</label>
-                            <input class="form-control number" type="text" name="number" placeholder="Number">
+                            <label class="control-label">Plate</label>
+                            <input class="form-control plate" type="text" name="plate" placeholder="Plate" required />
                         </div>
                         <div class="form-group">
-                            <label class="control-label">Fuel Type</label>
-                            <select name="fuel" id="" class="form-control">
-                                <option value="" hidden>Fuel Type</option>
+                            <label class="control-label">Brand</label>
+                            <input class="form-control brand" type="text" name="brand" placeholder="Brand" />
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Model</label>
+                            <input class="form-control model" type="text" name="model" placeholder="Model" />
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Type Of Vehicle</label>
+                            <select name="type" id="" class="form-control type" required>
+                                <option value="" hidden>Type Of Vehicle</option>
+                                @foreach ($vehicle_types as $item)
+                                    <option value="{{$item->id}}">{{$item->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Type Of Fuel</label>
+                            <select name="fuel" id="" class="form-control fuel" required>
+                                <option value="" hidden>Type Of Fuel</option>
                                 @foreach ($fuels as $item)
                                     <option value="{{$item->id}}">{{$item->name}}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="form-group">
-                            <label class="control-label">Type</label>
-                            <input class="form-control type" type="text" name="type" placeholder="Vehicle Type">
+                            <label class="control-label">Capacity</label>
+                            <input class="form-control capacity" type="number" min="0" name="capacity" placeholder="Capacity" />
                         </div>
                         <div class="form-group">
                             <label class="control-label">Driver</label>
-                            <input class="form-control driver" type="text" name="driver" placeholder="Driver">
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label">Description</label>
-                            <textarea class="form-control name" rows="3" name="description" placeholder="Description"></textarea>
+                            <select name="driver" id="" class="form-control driver">
+                                <option value="" hidden>Select Driver</option>
+                                @foreach ($drivers as $item)
+                                    <option value="{{$item->id}}">{{$item->name}}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>  
                     <div class="modal-footer">
@@ -174,18 +214,22 @@
 
         $(".btn-edit").click(function(){
             let id = $(this).data("id");
-            let number = $(this).parents('tr').find(".number").text().trim();
+            let plate = $(this).parents('tr').find(".plate").text().trim();
+            let model = $(this).parents('tr').find(".model").text().trim();
+            let brand = $(this).parents('tr').find(".brand").text().trim();
+            let capacity = $(this).parents('tr').find(".capacity").text().trim();
             let fuel = $(this).parents('tr').find(".fuel").data('id');
-            let type = $(this).parents('tr').find(".type").text().trim();
-            let driver = $(this).parents('tr').find(".driver").text().trim();
-            let description = $(this).parents('tr').find(".description").text().trim();
+            let type = $(this).parents('tr').find(".type").data('id');
+            let driver = $(this).parents('tr').find(".driver").data('id');
             $("#edit_form input.form-control").val('');
             $("#editModal .id").val(id);
-            $("#editModal .number").val(number);
+            $("#editModal .plate").val(plate);
+            $("#editModal .model").val(model);
+            $("#editModal .brand").val(brand);
+            $("#editModal .capacity").val(capacity);
             $("#editModal .fuel").val(fuel);
             $("#editModal .type").val(type);
             $("#editModal .driver").val(driver);
-            $("#editModal .description").val(description);
             $("#editModal").modal();
         });
 

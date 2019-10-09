@@ -45,13 +45,11 @@ class User extends Authenticatable
         return $this->role->slug == $role;
     }
 
-    public function unit(){
-        return $this->belongsTo('App\Models\Unit');
-    }
-
     public function tank(){
-        return $this->belongsTo('App\Models\Tank');
+        return $this->hasOne('App\Models\Tank');
     }
 
-
+    public function location(){
+        return $this->belongsTo('App\Models\Location');
+    }
 }

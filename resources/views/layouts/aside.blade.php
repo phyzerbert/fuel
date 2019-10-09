@@ -33,12 +33,25 @@
                         <li class="@if($page == 'filling') mm-active @endif"><a href="{{route('filling.index')}}">Filling</a></li>
                     </ul>
                 </li> 
-                <li class="@if($page == 'fuel') mm-active @endif"><a href="{{route('fuel.index')}}"><i class="fas fa-gas-pump mr-2"></i> Fuel</a></li>
                 <li class="@if($page == 'tank') mm-active @endif"><a href="{{route('tank.index')}}"><i class="fas fa-box mr-2"></i> Tanks</a></li>
                 <li class="@if($page == 'vehicle') mm-active @endif"><a href="{{route('vehicle.index')}}"><i class="fas fa-car mr-2"></i> Vichles</a></li>
-                <li class="@if($page == 'unit') mm-active @endif"><a href="{{route('unit.index')}}"><i class="fas fa-layer-group mr-2"></i> Units</a></li>
                 <li class="@if($page == 'user') mm-active @endif"><a href="{{route('users.index')}}"><i class="fas fa-user mr-2"></i> Users</a></li>
-                             
+                <li class="@if($page == 'driver') mm-active @endif"><a href="{{route('driver.index')}}"><i class="fas fa-user mr-2"></i> Drivers</a></li>
+                @php
+                    $setting_items = ['fuel', 'vehicle_type', 'location', 'city'];
+                @endphp
+                <li class="@if(in_array($page, $setting_items)) mm-active @endif">
+                    <a class="has-arrow material-ripple" href="#">
+                        <i class="fas fa-cog mr-2"></i>
+                        Settings
+                    </a>
+                    <ul class="nav-second-level">
+                        <li class="@if($page == 'fuel') mm-active @endif"><a href="{{route('fuel.index')}}">Fuel</a></li>
+                        <li class="@if($page == 'vehicle_type') mm-active @endif"><a href="{{route('vehicle_type.index')}}">Type Of Vehicle</a></li>
+                        <li class="@if($page == 'location') mm-active @endif"><a href="{{route('location.index')}}">Location</a></li>
+                        <li class="@if($page == 'city') mm-active @endif"><a href="{{route('city.index')}}">City</a></li>
+                    </ul>
+                </li>          
             </ul>
         </nav>
     </div>
